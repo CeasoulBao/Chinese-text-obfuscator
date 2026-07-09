@@ -180,7 +180,7 @@ export function ImageSettings({ value, onChange }: ImageSettingsProps) {
               type="range"
               min="12"
               max="240"
-              step="4"
+              step="2"
               value={value.verticalLines.spacing}
               onChange={(event) =>
                 patch({
