@@ -6,6 +6,7 @@ import { Notice } from './components/Notice'
 import { OutputPanel } from './components/OutputPanel'
 import { PipelineEditor } from './components/PipelineEditor'
 import { PresetSelector } from './components/PresetSelector'
+import { SettingsTabs, type SettingsTab } from './components/SettingsTabs'
 import { TextEditor } from './components/TextEditor'
 import { runPipeline } from './obfuscation/pipeline'
 import { transformRegistry } from './obfuscation/registry'
@@ -25,6 +26,7 @@ export default function App() {
     useState<ImageSettingsType>(defaultImageSettings)
   const [exportStatus, setExportStatus] = useState('')
   const [exporting, setExporting] = useState(false)
+  const [activeSettingsTab, setActiveSettingsTab] = useState<SettingsTab>('text')
 
   const result = useMemo(() => {
     const items = state.pipeline.flatMap((item) => {
@@ -87,61 +89,92 @@ export default function App() {
       <Notice>
         这是文本混淆工具，不是加密工具。任何设置都不能保证避开 AI、OCR、内容审核或账号限制。
       </Notice>
-      <div className="workspace-grid">
-        <TextEditor
-          value={state.sourceText}
-          seed={state.seed}
-          onChange={(value) => dispatch({ type: 'set-source', value })}
-          onSeedChange={(value) => dispatch({ type: 'set-seed', value })}
-          onClear={() => dispatch({ type: 'clear-content' })}
-        />
-        <section className="panel pipeline-panel" aria-labelledby="pipeline-title">
-          <div className="section-heading">
-            <div>
-              <span className="section-number">02</span>
-              <h2 id="pipeline-title">组合流水线</h2>
-            </div>
-            <span className="flow-mark">上 → 下</span>
+      <div className="workspace-frame">
+        <div className="text-column">
+          <TextEditor
+            value={state.sourceText}
+            seed={state.seed}
+            onChange={(value) => dispatch({ type: 'set-source', value })}
+            onSeedChange={(value) => dispatch({ type: 'set-seed', value })}
+            onClear={() => dispatch({ type: 'clear-content' })}
+          />
+          <OutputPanel value={result.text} status={copyStatus} onCopy={copyResult} />
+        </div>
+
+        <aside className="settings-column" aria-label="参数设置">
+          <SettingsTabs value={activeSettingsTab} onChange={setActiveSettingsTab} />
+          <div className="settings-panes">
+            <section
+              id="settings-panel-text"
+              className="settings-pane"
+              role="tabpanel"
+              aria-labelledby="settings-tab-text"
+              hidden={activeSettingsTab !== 'text'}
+            >
+              <div className="panel pipeline-panel">
+                <div className="section-heading">
+                  <div>
+                    <span className="section-number">03</span>
+                    <h2 id="pipeline-title">文本混淆参数</h2>
+                  </div>
+                  <span className="flow-mark">上 → 下</span>
+                </div>
+                <PresetSelector
+                  value={state.preset}
+                  onChange={(preset) => dispatch({ type: 'apply-preset', preset })}
+                />
+                {showReadabilityWarning && (
+                  <Notice tone="warning">
+                    当前组合可能显著降低可读性，请在发送前核对结果。
+                  </Notice>
+                )}
+                <PipelineEditor
+                  items={state.pipeline}
+                  onToggle={(id) => dispatch({ type: 'toggle-module', id })}
+                  onIntensity={(id, intensity) =>
+                    dispatch({ type: 'set-intensity', id, intensity })
+                  }
+                  onMove={(id, direction) =>
+                    dispatch({ type: 'move-module', id, direction })
+                  }
+                  onConfig={(id, config) =>
+                    dispatch({ type: 'set-config', id, config })
+                  }
+                />
+              </div>
+            </section>
+
+            <section
+              id="settings-panel-image"
+              className="settings-pane"
+              role="tabpanel"
+              aria-labelledby="settings-tab-image"
+              hidden={activeSettingsTab !== 'image'}
+            >
+              <div className="panel image-panel">
+                <div className="section-heading">
+                  <div>
+                    <span className="section-number">04</span>
+                    <h2 id="image-title">图片排版与导出</h2>
+                  </div>
+                  <span className="flow-mark">PNG · 本地生成</span>
+                </div>
+                <ImageSettings value={imageSettings} onChange={setImageSettings} />
+                <CanvasPreview
+                  text={result.text}
+                  settings={imageSettings}
+                  seed={state.seed || '字隙-default'}
+                />
+                <ExportControls
+                  disabled={!result.text}
+                  busy={exporting}
+                  status={exportStatus}
+                  onExport={exportImages}
+                />
+              </div>
+            </section>
           </div>
-          <PresetSelector
-            value={state.preset}
-            onChange={(preset) => dispatch({ type: 'apply-preset', preset })}
-          />
-          {showReadabilityWarning && (
-            <Notice tone="warning">当前组合可能显著降低可读性，请在发送前核对结果。</Notice>
-          )}
-          <PipelineEditor
-            items={state.pipeline}
-            onToggle={(id) => dispatch({ type: 'toggle-module', id })}
-            onIntensity={(id, intensity) =>
-              dispatch({ type: 'set-intensity', id, intensity })
-            }
-            onMove={(id, direction) => dispatch({ type: 'move-module', id, direction })}
-            onConfig={(id, config) => dispatch({ type: 'set-config', id, config })}
-          />
-        </section>
-        <OutputPanel value={result.text} status={copyStatus} onCopy={copyResult} />
-        <section className="panel image-panel" aria-labelledby="image-title">
-          <div className="section-heading">
-            <div>
-              <span className="section-number">04</span>
-              <h2 id="image-title">图片排版</h2>
-            </div>
-            <span className="flow-mark">PNG · 本地生成</span>
-          </div>
-          <ImageSettings value={imageSettings} onChange={setImageSettings} />
-          <CanvasPreview
-            text={result.text}
-            settings={imageSettings}
-            seed={state.seed || '字隙-default'}
-          />
-          <ExportControls
-            disabled={!result.text}
-            busy={exporting}
-            status={exportStatus}
-            onExport={exportImages}
-          />
-        </section>
+        </aside>
       </div>
     </main>
   )

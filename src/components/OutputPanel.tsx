@@ -9,7 +9,7 @@ export function OutputPanel({ value, status, onCopy }: OutputPanelProps) {
     <section className="panel output-panel" aria-labelledby="output-title">
       <div className="section-heading">
         <div>
-          <span className="section-number">03</span>
+          <span className="section-number">02</span>
           <h2 id="output-title">混淆结果</h2>
         </div>
         <button className="primary-button" type="button" onClick={onCopy} disabled={!value}>

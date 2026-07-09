@@ -9,6 +9,18 @@ describe('App text workflow', () => {
     })
   })
 
+  it('opens text settings by default and switches tabs with keyboard', () => {
+    render(<App />)
+    const textTab = screen.getByRole('tab', { name: /文本混淆/ })
+    const imageTab = screen.getByRole('tab', { name: /图片导出/ })
+    expect(textTab).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tabpanel', { name: /文本混淆/ })).toBeVisible()
+
+    fireEvent.keyDown(textTab, { key: 'ArrowRight' })
+    expect(imageTab).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tabpanel', { name: /图片导出/ })).toBeVisible()
+  })
+
   it('transforms entered text and can clear it', () => {
     render(<App />)
     const input = screen.getByLabelText('输入需要处理的文字')
@@ -81,6 +93,7 @@ describe('App text workflow', () => {
 
   it('configures image overlays and enables export after input', () => {
     render(<App />)
+    fireEvent.click(screen.getByRole('tab', { name: /图片导出/ }))
     expect(screen.getByRole('button', { name: '自动切图导出' })).toBeDisabled()
     fireEvent.change(screen.getByLabelText('输入需要处理的文字'), {
       target: { value: '图片测试' },
