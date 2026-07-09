@@ -5,6 +5,8 @@
 ## 功能
 
 - 自定义词典替换。
+- 一个原词可配置多个候选替换词。
+- 导入、合并和导出离线 JSON 词典包。
 - 同音字与形近字替换。
 - 字符分组乱序。
 - 随机符号穿插。
@@ -65,6 +67,10 @@ src/
   state/            应用状态与预设
   types/            共享类型
 ```
+
+## 贡献社区词典
+
+仓库的 [`dictionaries/`](dictionaries/) 目录包含示例、JSON Schema 和共享说明。网友可以提交 Pull Request 增加主题词典；应用本身不会联网读取这些文件。完整要求见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 许可证
 

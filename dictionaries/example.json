@@ -1,0 +1,22 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "name": "社区词典示例",
+  "description": "演示一词多候选、许可证信息和可合并的共享格式。",
+  "author": "Text Obfuscator contributors",
+  "license": "CC0-1.0",
+  "entries": [
+    {
+      "source": "中国",
+      "replacements": ["印度", "东大", "老钟"]
+    },
+    {
+      "source": "黑龙江",
+      "replacements": ["HLJ", "嘿陇茳"]
+    },
+    {
+      "source": "检查组",
+      "replacements": ["巡店队", "灰制服"]
+    }
+  ]
+}
