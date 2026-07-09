@@ -1,4 +1,7 @@
 import { useMemo, useReducer, useState } from 'react'
+import { CanvasPreview } from './components/CanvasPreview'
+import { ExportControls } from './components/ExportControls'
+import { ImageSettings } from './components/ImageSettings'
 import { Notice } from './components/Notice'
 import { OutputPanel } from './components/OutputPanel'
 import { PipelineEditor } from './components/PipelineEditor'
@@ -7,10 +10,21 @@ import { TextEditor } from './components/TextEditor'
 import { runPipeline } from './obfuscation/pipeline'
 import { transformRegistry } from './obfuscation/registry'
 import { appReducer, createInitialState } from './state/appState'
+import { createImagePages, type ExportMode } from './image/compose'
+import { downloadCanvas, exportFilename } from './image/export'
+import { renderPageToCanvas } from './image/render'
+import {
+  defaultImageSettings,
+  type ImageSettings as ImageSettingsType,
+} from './types/image'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, undefined, createInitialState)
   const [copyStatus, setCopyStatus] = useState('')
+  const [imageSettings, setImageSettings] =
+    useState<ImageSettingsType>(defaultImageSettings)
+  const [exportStatus, setExportStatus] = useState('')
+  const [exporting, setExporting] = useState(false)
 
   const result = useMemo(() => {
     const items = state.pipeline.flatMap((item) => {
@@ -41,6 +55,25 @@ export default function App() {
   const showReadabilityWarning =
     state.preset === 'heavy' ||
     state.pipeline.filter((item) => item.enabled).some((item) => item.intensity >= 0.6)
+
+  const exportImages = async (mode: ExportMode) => {
+    setExporting(true)
+    setExportStatus('')
+    try {
+      const pages = createImagePages(result.text, imageSettings, mode)
+      for (const page of pages) {
+        const canvas = renderPageToCanvas(page, imageSettings, state.seed || '字隙-default')
+        await downloadCanvas(canvas, exportFilename('字隙', page.index, page.total))
+      }
+      setExportStatus(
+        mode === 'split' ? `已生成 ${pages.length} 张图片` : '长图已经生成',
+      )
+    } catch (reason) {
+      setExportStatus(reason instanceof Error ? reason.message : '图片生成失败')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   return (
     <main className="app-shell">
@@ -88,6 +121,27 @@ export default function App() {
           />
         </section>
         <OutputPanel value={result.text} status={copyStatus} onCopy={copyResult} />
+        <section className="panel image-panel" aria-labelledby="image-title">
+          <div className="section-heading">
+            <div>
+              <span className="section-number">04</span>
+              <h2 id="image-title">图片排版</h2>
+            </div>
+            <span className="flow-mark">PNG · 本地生成</span>
+          </div>
+          <ImageSettings value={imageSettings} onChange={setImageSettings} />
+          <CanvasPreview
+            text={result.text}
+            settings={imageSettings}
+            seed={state.seed || '字隙-default'}
+          />
+          <ExportControls
+            disabled={!result.text}
+            busy={exporting}
+            status={exportStatus}
+            onExport={exportImages}
+          />
+        </section>
       </div>
     </main>
   )

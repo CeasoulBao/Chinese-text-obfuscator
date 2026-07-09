@@ -39,4 +39,17 @@ describe('App text workflow', () => {
     fireEvent.change(source, { target: { value: '新词' } })
     expect(source).toHaveValue('新词')
   })
+
+  it('configures image overlays and enables export after input', () => {
+    render(<App />)
+    expect(screen.getByRole('button', { name: '自动切图导出' })).toBeDisabled()
+    fireEvent.change(screen.getByLabelText('输入需要处理的文字'), {
+      target: { value: '图片测试' },
+    })
+    expect(screen.getByRole('button', { name: '自动切图导出' })).toBeEnabled()
+    fireEvent.click(screen.getByLabelText('纵向穿列线'))
+    expect(screen.getByLabelText('纵向穿列线')).toBeChecked()
+    fireEvent.change(screen.getByLabelText('图片字号'), { target: { value: '44' } })
+    expect(screen.getByLabelText('图片字号')).toHaveValue(44)
+  })
 })
