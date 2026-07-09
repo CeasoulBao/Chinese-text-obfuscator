@@ -20,6 +20,7 @@ export const dictionaryTransform: TransformModule<DictionaryConfig> = {
 
     if (entries.length === 0 || context.intensity === 0) return text
 
+    const selectedReplacements = new Map<string, string>()
     let output = ''
     let cursor = 0
     while (cursor < text.length) {
@@ -33,10 +34,16 @@ export const dictionaryTransform: TransformModule<DictionaryConfig> = {
       }
 
       const candidates = match.replacements.map((value) => value.trim()).filter(Boolean)
-      output +=
-        candidates.length > 0 && context.random.chance(context.intensity)
-          ? context.random.pick(candidates)
-          : match.source
+      if (candidates.length > 0 && context.random.chance(context.intensity)) {
+        let replacement = selectedReplacements.get(match.source)
+        if (replacement === undefined) {
+          replacement = context.random.pick(candidates)
+          selectedReplacements.set(match.source, replacement)
+        }
+        output += replacement
+      } else {
+        output += match.source
+      }
       cursor += match.source.length
     }
     return output

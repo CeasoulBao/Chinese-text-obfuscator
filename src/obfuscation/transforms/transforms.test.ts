@@ -37,6 +37,27 @@ describe('dictionaryTransform', () => {
     expect(first.match(/印度|东大|老钟/g)).toHaveLength(2)
   })
 
+  it('uses one replacement candidate for every replaced occurrence in one input', () => {
+    let pickIndex = 0
+    const cyclingContext = {
+      intensity: 1,
+      random: {
+        next: () => 0,
+        chance: () => true,
+        integer: (min: number) => min,
+        pick: <T,>(values: readonly T[]) => values[pickIndex++ % values.length]!,
+        shuffle: <T,>(values: readonly T[]) => [...values],
+      },
+    }
+    const output = dictionaryTransform.transform(
+      '中国、中国、中国',
+      { entries: [{ source: '中国', replacements: ['印度', '东大', '老钟'] }] },
+      cyclingContext,
+    )
+
+    expect(new Set(output.split('、'))).toEqual(new Set(['印度']))
+  })
+
   it('keeps the source when all replacement candidates are empty', () => {
     expect(
       dictionaryTransform.transform(
