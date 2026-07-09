@@ -51,7 +51,7 @@ export function DictionaryEditor({ entries, onChange }: DictionaryEditorProps) {
       </div>
 
       {entries.map((entry, entryIndex) => (
-        <article className="dictionary-entry" key={`${entryIndex}-${entry.source}`}>
+        <article className="dictionary-entry" key={entryIndex}>
           <div className="dictionary-source-row">
             <label htmlFor={`dictionary-source-${entryIndex}`}>
               原词 {String(entryIndex + 1).padStart(2, '0')}

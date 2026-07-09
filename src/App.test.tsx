@@ -52,6 +52,18 @@ describe('App text workflow', () => {
     expect(source).toHaveValue('新词')
   })
 
+  it('keeps the same dictionary input mounted during Chinese IME composition', () => {
+    render(<App />)
+    const source = screen.getByLabelText('第 1 条原词')
+    fireEvent.compositionStart(source)
+    fireEvent.change(source, { target: { value: '中国' } })
+    const currentSource = screen.getByLabelText('第 1 条原词')
+    fireEvent.compositionEnd(currentSource)
+
+    expect(currentSource).toBe(source)
+    expect(currentSource).toHaveValue('中国')
+  })
+
   it('adds multiple replacement candidates to one source', () => {
     render(<App />)
     const addButtons = screen.getAllByRole('button', { name: '＋ 添加候选词' })
