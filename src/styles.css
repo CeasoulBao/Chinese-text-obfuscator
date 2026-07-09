@@ -817,6 +817,12 @@ input[type="range"] {
   margin-top: 12px;
 }
 
+.overlay-card output {
+  color: var(--red);
+  font-family: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.68rem;
+}
+
 .canvas-stage {
   display: grid;
   min-height: 300px;

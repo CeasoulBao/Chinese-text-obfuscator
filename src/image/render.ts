@@ -64,7 +64,7 @@ function drawOverlays(
   if (settings.verticalLines.enabled) {
     setAlphaColor(context, settings.verticalLines.color, settings.verticalLines.opacity)
     context.lineWidth = settings.verticalLines.thickness
-    const spacing = Math.max(24, settings.verticalLines.spacing)
+    const spacing = Math.max(12, settings.verticalLines.spacing)
     for (let x = settings.padding; x <= page.width - settings.padding; x += spacing) {
       context.beginPath()
       context.moveTo(x, settings.padding * 0.45)

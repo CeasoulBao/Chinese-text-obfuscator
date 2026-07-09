@@ -5,6 +5,13 @@ interface ImageSettingsProps {
   onChange(value: ImageSettingsType): void
 }
 
+function verticalDensityLabel(spacing: number): string {
+  if (spacing <= 24) return '极密'
+  if (spacing <= 48) return '密集'
+  if (spacing <= 96) return '中等'
+  return '稀疏'
+}
+
 export function ImageSettings({ value, onChange }: ImageSettingsProps) {
   const patch = (changes: Partial<ImageSettingsType>) => onChange({ ...value, ...changes })
 
@@ -164,12 +171,16 @@ export function ImageSettings({ value, onChange }: ImageSettingsProps) {
           </legend>
           <label>
             间距
+            <output>
+              {value.verticalLines.spacing}px ·{' '}
+              {verticalDensityLabel(value.verticalLines.spacing)}
+            </output>
             <input
               aria-label="竖线间距"
               type="range"
-              min="50"
+              min="12"
               max="240"
-              step="10"
+              step="4"
               value={value.verticalLines.spacing}
               onChange={(event) =>
                 patch({

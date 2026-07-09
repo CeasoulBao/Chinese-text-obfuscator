@@ -101,6 +101,8 @@ describe('App text workflow', () => {
     expect(screen.getByRole('button', { name: '自动切图导出' })).toBeEnabled()
     fireEvent.click(screen.getByLabelText('纵向穿列线'))
     expect(screen.getByLabelText('纵向穿列线')).toBeChecked()
+    expect(screen.getByLabelText('竖线间距')).toHaveAttribute('min', '12')
+    expect(screen.getByText('130px · 稀疏')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('图片字号'), { target: { value: '44' } })
     expect(screen.getByLabelText('图片字号')).toHaveValue(44)
   })
