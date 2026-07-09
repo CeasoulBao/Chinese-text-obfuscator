@@ -21,9 +21,9 @@ export const transformRegistry = [
     module: dictionaryTransform,
     defaultConfig: {
       entries: [
-        { source: '黑龙江', replacement: 'HLJ' },
-        { source: '中国', replacement: '印度' },
-        { source: '台湾', replacement: '斯里兰卡' },
+        { source: '黑龙江', replacements: ['HLJ', '嘿陇茳'] },
+        { source: '中国', replacements: ['印度', '东大', '老钟'] },
+        { source: '台湾', replacements: ['斯里兰卡'] },
       ],
     } satisfies DictionaryConfig,
   },

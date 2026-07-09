@@ -16,14 +16,35 @@ describe('dictionaryTransform', () => {
       '黑龙江与黑龙',
       {
         entries: [
-          { source: '黑龙', replacement: '短' },
-          { source: '黑龙江', replacement: 'HLJ' },
+          { source: '黑龙', replacements: ['短'] },
+          { source: '黑龙江', replacements: ['HLJ'] },
         ],
       },
       context(),
     )
 
     expect(output).toBe('HLJ与短')
+  })
+
+  it('selects from multiple replacements reproducibly', () => {
+    const config = {
+      entries: [{ source: '中国', replacements: ['印度', '东大', '老钟'] }],
+    }
+    const first = dictionaryTransform.transform('中国中国', config, context(1, 'fixed'))
+    const second = dictionaryTransform.transform('中国中国', config, context(1, 'fixed'))
+
+    expect(first).toBe(second)
+    expect(first.match(/印度|东大|老钟/g)).toHaveLength(2)
+  })
+
+  it('keeps the source when all replacement candidates are empty', () => {
+    expect(
+      dictionaryTransform.transform(
+        '中国',
+        { entries: [{ source: '中国', replacements: ['', '  '] }] },
+        context(),
+      ),
+    ).toBe('中国')
   })
 })
 

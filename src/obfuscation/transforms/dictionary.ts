@@ -2,7 +2,7 @@ import type { TransformModule } from '../../types/obfuscation'
 
 export interface DictionaryEntry {
   source: string
-  replacement: string
+  replacements: string[]
 }
 
 export interface DictionaryConfig {
@@ -32,7 +32,11 @@ export const dictionaryTransform: TransformModule<DictionaryConfig> = {
         continue
       }
 
-      output += context.random.chance(context.intensity) ? match.replacement : match.source
+      const candidates = match.replacements.map((value) => value.trim()).filter(Boolean)
+      output +=
+        candidates.length > 0 && context.random.chance(context.intensity)
+          ? context.random.pick(candidates)
+          : match.source
       cursor += match.source.length
     }
     return output
