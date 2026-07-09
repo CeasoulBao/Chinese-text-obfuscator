@@ -210,6 +210,25 @@ export function ImageSettings({ value, onChange }: ImageSettingsProps) {
               }
             />
           </label>
+          <label>
+            透明度
+            <input
+              aria-label="竖线透明度"
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.05"
+              value={value.verticalLines.opacity}
+              onChange={(event) =>
+                patch({
+                  verticalLines: {
+                    ...value.verticalLines,
+                    opacity: Number(event.target.value),
+                  },
+                })
+              }
+            />
+          </label>
           <label className="color-control">
             颜色
             <input
