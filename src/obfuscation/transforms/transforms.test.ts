@@ -10,6 +10,17 @@ const context = (intensity = 1, seed = 'test') => ({
   random: createRandom(seed),
 })
 
+const alwaysShuffleContext = {
+  intensity: 1,
+  random: {
+    next: () => 0,
+    chance: () => true,
+    integer: (min: number) => min,
+    pick: <T,>(values: readonly T[]) => values[0]!,
+    shuffle: <T,>(values: readonly T[]) => [...values].reverse(),
+  },
+}
+
 describe('dictionaryTransform', () => {
   it('matches longer phrases before shorter phrases', () => {
     const output = dictionaryTransform.transform(
@@ -88,6 +99,36 @@ describe('similarCharsTransform', () => {
 })
 
 describe('shuffleTransform', () => {
+  it('shuffles inside a single word when there is no adjacent word partner', () => {
+    expect(
+      shuffleTransform.transform(
+        '可以',
+        { minGroupSize: 2, maxGroupSize: 4 },
+        alwaysShuffleContext,
+      ),
+    ).toBe('以可')
+  })
+
+  it('interleaves only the current word and its adjacent word phrase', () => {
+    expect(
+      shuffleTransform.transform(
+        '专注电子竞技',
+        { minGroupSize: 2, maxGroupSize: 4 },
+        alwaysShuffleContext,
+      ),
+    ).toBe('专电注子竞技')
+  })
+
+  it('does not mix characters across punctuation-separated words', () => {
+    expect(
+      shuffleTransform.transform(
+        '专注，电子竞技',
+        { minGroupSize: 2, maxGroupSize: 4 },
+        alwaysShuffleContext,
+      ),
+    ).toBe('注专，电竞子技')
+  })
+
   it('preserves punctuation and paragraph boundaries', () => {
     const output = shuffleTransform.transform(
       '瘟神来了：黑龙江。\n第二段！',
